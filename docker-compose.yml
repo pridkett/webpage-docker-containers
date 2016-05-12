@@ -1,0 +1,17 @@
+# docker-compose file for my web site
+version: '2'
+
+services:
+
+  nginx-proxy:
+    build: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - personal-website
+    mem_limit: 64m
+
+  personal-website:
+    build: ./web
+    mem_limit: 128m
