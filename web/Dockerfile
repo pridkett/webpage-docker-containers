@@ -1,2 +1,3 @@
-FROM httpd:2.4
-COPY ./public_html/ /usr/local/apache2/htdocs
+FROM alpine:3.3
+RUN apk add --no-cache nginx
+CMD ["nginx", "-g", "daemon off;"]

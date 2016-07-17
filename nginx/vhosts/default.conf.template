@@ -4,11 +4,11 @@ server {
     listen 443 http2 default_server ssl;
     listen [::]:443 http2 default_server ssl;
 
-    server_name wagstrom.net;
+    server_name ${DEFAULT_SERVER_NAME};
 
     root /usr/share/nginx/html;
     index index.html;
 
-    # redirect all traffic to https and patrick.wagstrom.net
-    return 301 https://patrick.wagstrom.net$request_uri;
+    # redirect all traffic to https and ${PRIMARY_SERVER_NAME}
+    return 301 https://${PRIMARY_SERVER_NAME}$request_uri;
 }

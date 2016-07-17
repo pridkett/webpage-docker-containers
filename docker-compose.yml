@@ -11,7 +11,11 @@ services:
     links:
       - personal-website
     mem_limit: 64m
+    volumes:
+      - ~/ssl:/etc/ssl
 
   personal-website:
     build: ./web
-    mem_limit: 128m
+    mem_limit: 64m
+    volumes:
+      - ~/public_html:/usr/share/nginx/html
