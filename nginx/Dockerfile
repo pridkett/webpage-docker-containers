@@ -19,8 +19,8 @@ RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
 RUN curl -f -L -sS https://ngxpagespeed.com/install -o build_ngx_pagespeed.sh
 RUN bash ./build_ngx_pagespeed.sh -y -v $NPS_VERSION --nginx-version $NGINX_VERSION -a '--with-http_ssl_module --with-http_v2_module' && \
     mkdir /etc/nginx && \
-    cp /root/nginx-*/conf/mime.types /etc/nginx/
-# && rm -rf /root/nginx-$NGINX_VERSION /root/ngx_pagespeed-latest-stable
+    cp /root/nginx-*/conf/mime.types /etc/nginx/ && \
+    rm -rf /root/nginx-$NGINX_VERSION /root/ngx_pagespeed-latest-stable
 
 # Add main NGINX configuration
 COPY nginx.conf /etc/nginx/
