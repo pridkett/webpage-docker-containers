@@ -1,0 +1,7 @@
+:80
+
+log stdout
+
+errors stdout
+
+root /srv

@@ -1,10 +1,13 @@
 FROM alpine:3.5
+MAINTAINER Patrick Wagstrom <patrick@wagstrom.net>
 
-RUN apk add --no-cache tar curl bash
+ARG plugins=http.filemanager
+
+RUN apk add --no-cache openssh-client git tar curl bash
 
 RUN curl --silent --show-error --fail --location \
       --header "Accept: application/tar+gzip, application/x-gzip, application/octet-stream" -o - \
-      "https://caddyserver.com/download/linux/amd64" \
+      "https://caddyserver.com/download/linux/amd64?plugins=${plugins}" \
     | tar --no-same-owner -C /usr/bin/ -xz caddy \
  && chmod 0755 /usr/bin/caddy \
  && /usr/bin/caddy -version

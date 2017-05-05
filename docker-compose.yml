@@ -10,12 +10,28 @@ services:
       - "443:443"
     links:
       - personal-website
+      - webdav-server
     mem_limit: 64m
+    # command: sleep 3600
     volumes:
       - ~/ssl:/etc/ssl
+    environment:
+      - DEFAULT_SERVER_NAME
+      - PRIMARY_SERVER_NAME
+      - SECURE_SERVER_NAME
 
   personal-website:
     build: ./web
     mem_limit: 64m
     volumes:
-      - ~/public_html:/usr/share/nginx/html
+      - ~/public_html:/srv
+      
+  webdav-server:
+    build: ./webdav
+    mem_limit: 64m
+    volumes:
+      - ~/webdav:/srv
+    environment:
+      - READWRITE=true
+      - WEBDAV_USERNAME
+      - WEBDAV_PASSWORD
