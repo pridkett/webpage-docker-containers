@@ -25,6 +25,14 @@ if [[ ! -d /var/log/nginx ]]; then
     mkdir /var/log/nginx
 fi
 
+if [[ ! -d /var/ngx_pagespeed_cache ]]; then
+    mkdir /var/ngx_pagespeed_cache
+fi
+
+if [[ ! -d /var/log/pagespeed ]]; then
+    mkdir /var/log/pagespeed
+fi
+
 if [[ -z "$1" ]]; then
     set -- "/usr/local/nginx/sbin/nginx" "-c" "/etc/nginx/nginx.conf" "$@"
 fi
