@@ -10,7 +10,7 @@ ENV NGINX_VERSION 1.13.0
 ENV WGET_PROGRESS dot:mega
 
 RUN apt-get update && \
-    apt-get -y install curl sudo build-essential zlib1g-dev libpcre3 libpcre3-dev unzip wget locales libssl-dev && \
+    apt-get -y install curl sudo build-essential libssl1.0.0 zlib1g-dev libpcre3 libpcre3-dev unzip wget locales libssl-dev && \
     echo "America/New_York" > /etc/timezone && \
     locale-gen en_US.UTF-8 && dpkg-reconfigure locales && \
     curl -f -L -sS https://ngxpagespeed.com/install -o build_ngx_pagespeed.sh && \
