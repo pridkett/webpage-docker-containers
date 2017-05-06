@@ -18,7 +18,8 @@ RUN apt-get update && \
     mkdir /etc/nginx && \
     cp /root/nginx-*/conf/mime.types /etc/nginx/ && \
     rm -rf /root/nginx-$NGINX_VERSION /root/ngx_pagespeed-$NPS_VERSION* && \
-    apt -y autoremove build-essential
+    apt-get -y purge build-essential zlib1g-dev libpcre3-dev libssl-dev unzip wget curl && \
+    apt -y autoremove
 
 # Add main NGINX configuration
 COPY nginx.conf /etc/nginx/
