@@ -15,6 +15,11 @@ server {
     return 301 https://${SECURE_SERVER_NAME}$request_uri;
   }
 
+  # Exclude let's encrypt
+  location /.well-known {
+    return 301 https://${PRIMARY_SERVER_NAME}$request_uri;
+  }
+
   location / {
     try_files $uri @securewagstromnet;
   }
