@@ -33,5 +33,5 @@ services:
       - ~/webdav:/srv
     environment:
       - READWRITE=true
-      - WEBDAV_USERNAME
-      - WEBDAV_PASSWORD
+    env_file:
+      - .env
