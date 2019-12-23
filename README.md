@@ -21,11 +21,16 @@ Containers
 Mounted Volumes
 ---------------
 
-These containers require some persistence in order to function properly. In general, the directories should be made auotmatically, but in the off chance that they're not, here's a description:
+These containers require some persistence in order to function properly.
+In general, the directories should be made auotmatically, but in the off
+chance that they're not, here's a description:
 
 ### caddy-gen
 
-In addition to needing access to the docker host instance of `/var/run/docker.sock`, it also benefits from a persistent path mounted to `/etc/caddy/acme` and `/etc/caddy/ocsp`. This will make startup of the container much faster in the even that something goes haywire.
+In addition to needing access to the docker host instance of
+`/var/run/docker.sock`, it also benefits from a persistent path mounted to
+`/etc/caddy/acme` and `/etc/caddy/ocsp`. This will make startup of the
+container much faster in the even that something goes haywire.
 
 ### personal-website
 
@@ -33,16 +38,25 @@ This will serve all of the static content that is mounted to `/srv`.
 
 ### webdav-server
 
-This will serve all of the content that is mounted to `/srv` over webdav. By default this will be read-write once you're logged in.
+This will serve all of the content that is mounted to `/srv` over webdav.
+By default this will be read-write once you're logged in.
 
 ### vscode
 
-Persistence for the Visual Studio code setup is done by mounting a directoy to `/home/coder/.local/share/code-server`. Access to the underlying filesystem is done by mounting to `/home/coder/projects`.
+Persistence for the Visual Studio code setup is done by mounting a
+directoy to `/home/coder/.local/share/code-server`. Access to the
+underlying filesystem is done by mounting to `/home/coder/projects`.
+
+In addition, if you'd like to add support this container using Docker
+directly (i.e. for Visual Studio Code's remote features) you'll need to
+share `/var/run/docker.sock` as read-write.
 
 Hostnames
 ---------
 
-Hostnames for each of the individual services are set through the `virtual.host` and `virual.alias` labels that are applied to each container. This is the standard for projects that use `caddy-gen`.
+Hostnames for each of the individual services are set through the
+`virtual.host` and `virual.alias` labels that are applied to each
+container. This is the standard for projects that use `caddy-gen`.
 
 Future Changes
 --------------

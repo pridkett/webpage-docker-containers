@@ -45,15 +45,18 @@ services:
       - "virtual.websockets"
 
   vscode:
-    image: codercom/code-server:v2
+    build: ./code-server
     volumes:
       - ~/.local/share/code-server:/home/coder/.local/share/code-server
       - ~:/home/coder/projects
+      - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - "virtual.host=vscode.wagstrom.com"
-      # # - "virtual.alias=ww.myapp.com"
       - "virtual.port=8080"
       - "virtual.tls-email=patrick@wagstrom.net"
       - "virtual.websockets"
+    environment:
+      - SERVICE_URL=https://marketplace.visualstudio.com/_apis/public/gallery
+      - ITEM_URL=https://marketplace.visualstudio.com/items
     env_file:
       - .env
