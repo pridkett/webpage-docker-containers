@@ -1,31 +1,34 @@
-# docker-compose file for my web site
-version: '2'
+version: "2"
 
 services:
-
-  nginx-proxy:
-    build: ./nginx
+  caddy-gen:
+    container_name: caddy-gen
+    image: "wemakeservices/caddy-gen:latest"
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs/acme:/etc/caddy/acme
+      - ./certs/ocsp:/etc/caddy/ocsp
     ports:
       - "80:80"
       - "443:443"
-    links:
+    depends_on:
+      - vscode
       - personal-website
       - webdav-server
-    mem_limit: 64m
-    # command: sleep 3600
-    volumes:
-      - ~/ssl:/etc/ssl
-    environment:
-      - DEFAULT_SERVER_NAME
-      - PRIMARY_SERVER_NAME
-      - SECURE_SERVER_NAME
 
   personal-website:
     build: ./web
     mem_limit: 64m
     volumes:
       - ~/public_html:/srv
-      
+    labels:
+      - "virtual.host=patrick.wagstrom.net"
+      - "virtual.alias=wagstrom.net www.wagstrom.net"
+      - "virtual.port=80"
+      - "virtual.tls-email=patrick@wagstrom.net"
+      - "virtual.websockets"
+
   webdav-server:
     build: ./webdav
     mem_limit: 64m
@@ -33,5 +36,24 @@ services:
       - ~/webdav:/srv
     environment:
       - READWRITE=true
+    env_file:
+      - .env
+    labels:
+      - "virtual.host=secure.wagstrom.net"
+      - "virtual.port=80"
+      - "virtual.tls-email=patrick@wagstrom.net"
+      - "virtual.websockets"
+
+  vscode:
+    image: codercom/code-server:v2
+    volumes:
+      - ~/.local/share/code-server:/home/coder/.local/share/code-server
+      - ~:/home/coder/projects
+    labels:
+      - "virtual.host=vscode.wagstrom.com"
+      # # - "virtual.alias=ww.myapp.com"
+      - "virtual.port=8080"
+      - "virtual.tls-email=patrick@wagstrom.net"
+      - "virtual.websockets"
     env_file:
       - .env
