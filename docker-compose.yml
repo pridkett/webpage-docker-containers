@@ -22,7 +22,7 @@ services:
     build: ./web
     mem_limit: 64m
     volumes:
-      - ${HOME}/public_html:/srv
+      - /home/deploy/patrick.wagstrom.net/public:/srv
     labels:
       - "virtual.host=patrick.wagstrom.net"
       - "virtual.alias=wagstrom.net www.wagstrom.net"
@@ -70,9 +70,9 @@ services:
     volumes:
       - ${HOME}/Documents/workspace/patrick.wagstrom.net:/src
       - ${PWD}/hugo/hugo_serve.log:/hugo_serve.log
-    command: hugo server -w --bind=0.0.0.0 ${HUGO_SERVE_OPTS} --theme ${HUGO_THEME}
+    command: hugo server -w --bind=0.0.0.0 ${HUGO_SERVE_OPTS} -b https://${HUGO_HOST}/ --theme ${HUGO_THEME}
     labels:
-      - "virtual.host=hugo.wagstrom.net"
+      - "virtual.host=${HUGO_HOST}"
       - "virtual.port=1313"
       - "virtual.tls-email=patrick@wagstrom.net"
 
