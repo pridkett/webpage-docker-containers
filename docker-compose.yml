@@ -3,7 +3,8 @@ version: "2"
 services:
   caddy-gen:
     container_name: caddy-gen
-    image: "wemakeservices/caddy-gen:latest"
+    # image: "wemakeservices/caddy-gen:latest"
+    image: "wemakeservices/caddy-gen:0.2.0"
     restart: always
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
@@ -13,16 +14,19 @@ services:
       - "80:80"
       - "443:443"
     depends_on:
-      - vscode
+      # - hugo
       - personal-website
+      # - whoami
       - webdav-server
+      - cards
+      - httpbin
 
   personal-website:
-    container_name: caddy-website
-    build: ./web
+    container_name: website
+    image: caddy:alpine
     mem_limit: 64m
     volumes:
-      - /home/deploy/patrick.wagstrom.net/public:/srv
+      - /home/deploy/patrick.wagstrom.net/public:/usr/share/caddy
     labels:
       - "virtual.host=patrick.wagstrom.net"
       - "virtual.alias=wagstrom.net www.wagstrom.net"
@@ -30,14 +34,34 @@ services:
       - "virtual.tls-email=patrick@wagstrom.net"
       - "virtual.websockets"
 
+  cards:
+    container_name: cards
+    image: darrenjrobinson/cardsagainsthumanity:latest
+    command: /bin/bash /root/cah.sh
+    labels:
+      - "virtual.host=cards.wagstrom.net"
+      - "virtual.port=80"
+      - "virtual.tls-email=patrick@wagstrom.net"
+      - "virtual.websockets"
+
+  httpbin:
+    container_name: httpbin
+    image: kennethreitz/httpbin
+    labels:
+      - "virtual.host=httpbin.wagstrom.net"
+      - "virtual.port=80"
+      - "virtual.tls-email=patrick@wagstrom.net"
+
   webdav-server:
-    container_name: caddy-webdav
-    build: ./webdav
+    container_name: webdav
+    image: bytemark/webdav
     mem_limit: 64m
     volumes:
-      - ${HOME}/webdav:/srv
+      - ${HOME}/webdav:/var/lib/dav/data
     environment:
-      - READWRITE=true
+      - AUTH_TYPE=Basic
+      - USERNAME=${WEBDAV_USERNAME}
+      - PASSWORD=${WEBDAV_PASSWORD}
     env_file:
       - .env
     labels:
@@ -46,33 +70,101 @@ services:
       - "virtual.tls-email=patrick@wagstrom.net"
       - "virtual.websockets"
 
-  vscode:
-    container_name: vscode
-    build: ./code-server
-    volumes:
-      - ${HOME}/.local/share/code-server:/home/coder/.local/share/code-server
-      - ${HOME}/Documents/workspace:/home/coder/projects
-      - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      - "virtual.host=vscode.wagstrom.com"
-      - "virtual.port=8080"
-      - "virtual.tls-email=patrick@wagstrom.net"
-      - "virtual.websockets"
-    environment:
-      - SERVICE_URL=https://marketplace.visualstudio.com/_apis/public/gallery
-      - ITEM_URL=https://marketplace.visualstudio.com/items
-    env_file:
-      - .env
-
   hugo:
     container_name: hugo
     image: jguyomard/hugo-builder
     volumes:
       - ${HOME}/Documents/workspace/patrick.wagstrom.net:/src
       - ${PWD}/hugo/hugo_serve.log:/hugo_serve.log
-    command: hugo server -w --bind=0.0.0.0 ${HUGO_SERVE_OPTS} -b https://${HUGO_HOST}/ --theme ${HUGO_THEME}
+    command: hugo server -D -w --bind=0.0.0.0 ${HUGO_SERVE_OPTS} -b https://${HUGO_HOST}/ --theme ${HUGO_THEME}
     labels:
       - "virtual.host=${HUGO_HOST}"
       - "virtual.port=1313"
       - "virtual.tls-email=patrick@wagstrom.net"
+
+#  kittens-website:
+#    container_name: caddy-kittens
+#    build: ./kittens
+#    mem_limit: 64m
+#    volumes:
+#      - /home/deploy/kittens.ai/public:/srv
+#    labels:
+#      - "virtual.host=kittens.ai"
+#      - "virtual.alias=www.kittens.ai"
+#      - "virtual.port=80"
+#      - "virtual.tls-email=patrick@wagstrom.net"
+#      - "virtual.websockets"
+#  webdav-server:
+#    container_name: caddy-webdav
+#    build: ./webdav
+#    mem_limit: 64m
+#    volumes:
+#      - ${HOME}/webdav:/srv
+#    environment:
+#      - READWRITE=true
+#    env_file:
+#      - .env
+#    labels:
+#      - "virtual.host=secure.wagstrom.net"
+#      - "virtual.port=80"
+#      - "virtual.tls-email=patrick@wagstrom.net"
+#      - "virtual.websockets"
+
+
+  # vscode:
+    # container_name: vscode
+    # build: ./code-server
+    # volumes:
+      # - ${HOME}/.local/share/code-server:/home/coder/.local/share/code-server
+      # - ${HOME}/Documents/workspace:/home/coder/projects
+      # - /var/run/docker.sock:/var/run/docker.sock
+    # labels:
+      # - "virtual.host=vscode.wagstrom.com"
+      # - "virtual.port=8080"
+      # - "virtual.tls-email=patrick@wagstrom.net"
+      # - "virtual.websockets"
+    # environment:
+      # - SERVICE_URL=https://marketplace.visualstudio.com/_apis/public/gallery
+      # - ITEM_URL=https://marketplace.visualstudio.com/items
+    # env_file:
+      # - .env
+
+  # theia:
+    # container_name: theia
+    # image: theiaide/theia
+    # volumes:
+      # - ${HOME}/Documents/workspace:/home/project:cached
+      # - /var/run/docker.sock:/var/run/docker.sock
+    # labels:
+      # - "virtual.host=theia.wagstrom.com"
+      # - "virtual.port=3000"
+      # - "virtual.tls-email=patrick@wagstrom.net"
+      # - "virtual.websockets"
+    # env_file:
+      # - .env
+
+
+  # hugo:
+    # container_name: hugo
+    # image: jguyomard/hugo-builder
+    # volumes:
+      # - ${HOME}/Documents/workspace/patrick.wagstrom.net:/src
+      # - ${PWD}/hugo/hugo_serve.log:/hugo_serve.log
+    # command: hugo server -D -w --bind=0.0.0.0 ${HUGO_SERVE_OPTS} -b https://${HUGO_HOST}/ --theme ${HUGO_THEME}
+    # labels:
+      # - "virtual.host=${HUGO_HOST}"
+      # - "virtual.port=1313"
+      # - "virtual.tls-email=patrick@wagstrom.net"
+
+  # kittens-hugo:
+    # container_name: kittens-hugo
+    # image: jguyomard/hugo-builder
+    # volumes:
+      # - ${HOME}/Documents/workspace/kittens.ai:/src
+    # command: hugo server -w --bind=0.0.0.0 ${HUGO_SERVE_OPTS} -b https://${KITTENS_HUGO_HOST}/ --theme ${KITTENS_HUGO_THEME}
+    # labels:
+      # - "virtual.host=${KITTENS_HUGO_HOST}"
+      # - "virtual.port=1313"
+      # - "virtual.tls-email=patrick@wagstrom.net"
+
 
