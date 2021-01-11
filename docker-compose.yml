@@ -25,6 +25,7 @@ services:
     container_name: website
     image: caddy:alpine
     mem_limit: 64m
+    restart: always
     volumes:
       - /home/deploy/patrick.wagstrom.net/public:/usr/share/caddy
     labels:
@@ -36,8 +37,13 @@ services:
 
   cards:
     container_name: cards
-    image: darrenjrobinson/cardsagainsthumanity:latest
-    command: /bin/bash /root/cah.sh
+    # image: darrenjrobinson/cardsagainsthumanity:latest
+    # command: /bin/bash /root/cah.sh
+    build: cards
+    restart: always
+    volumes:
+      - ./cards/pyx.sqlite:/app/pyx.sqlite
+      - ./cards/server.sqlite:/app/server.sqlite
     labels:
       - "virtual.host=cards.wagstrom.net"
       - "virtual.port=80"
@@ -47,6 +53,7 @@ services:
   httpbin:
     container_name: httpbin
     image: kennethreitz/httpbin
+    restart: always
     labels:
       - "virtual.host=httpbin.wagstrom.net"
       - "virtual.port=80"
@@ -56,6 +63,7 @@ services:
     container_name: webdav
     image: bytemark/webdav
     mem_limit: 64m
+    restart: always
     volumes:
       - ${HOME}/webdav:/var/lib/dav/data
     environment:
@@ -73,6 +81,7 @@ services:
   hugo:
     container_name: hugo
     image: jguyomard/hugo-builder
+    restart: always
     volumes:
       - ${HOME}/Documents/workspace/patrick.wagstrom.net:/src
       - ${PWD}/hugo/hugo_serve.log:/hugo_serve.log
@@ -80,6 +89,21 @@ services:
     labels:
       - "virtual.host=${HUGO_HOST}"
       - "virtual.port=1313"
+      - "virtual.tls-email=patrick@wagstrom.net"
+
+  acme-dns:
+    container_name: acme-dns
+    image: joohoi/acme-dns
+    restart: always
+    ports:
+      - "53:53"
+      - "53:53/udp"
+    volumes:
+      - ./acme-dns/config:/etc/acme-dns:ro
+      - ./acme-dns/data:/var/lib/acme-dns
+    labels:
+      - "virtual.host=${ACME_HOST}"
+      - "virtual.port=80"
       - "virtual.tls-email=patrick@wagstrom.net"
 
 #  kittens-website:
