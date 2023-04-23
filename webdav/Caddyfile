@@ -4,12 +4,11 @@ log stdout
 
 errors stdout
 
+# root /srv
+
 basicauth / ${WEBDAV_USERNAME} ${WEBDAV_PASSWORD}
-filemanager / {
-    webdav /webdav
-    block /
-    allow_commands false
-    ${WEBDAV_USERNAME}:
-        allow /
-        allow_commands true
+
+webdav /srv {
+  scope /
+
 }

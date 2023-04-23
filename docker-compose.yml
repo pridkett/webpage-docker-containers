@@ -4,12 +4,14 @@ services:
   caddy-gen:
     container_name: caddy-gen
     # image: "wemakeservices/caddy-gen:latest"
-    image: "wemakeservices/caddy-gen:0.2.0"
+    image: "wemakeservices/caddy-gen:latest"
     restart: always
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ${PWD}/certs/acme:/etc/caddy/acme
       - ${PWD}/certs/ocsp:/etc/caddy/ocsp
+      - ${PWD}/certs/wagstrom.net-chain.pem:/etc/ssl/wagstrom.net-chain.pem:ro
+      - ${PWD}/certs/wagstrom.net.pem:/etc/ssl/wagstrom.net.pem:ro
     ports:
       - "80:80"
       - "443:443"
@@ -32,7 +34,7 @@ services:
       - "virtual.host=patrick.wagstrom.net"
       - "virtual.alias=wagstrom.net www.wagstrom.net"
       - "virtual.port=80"
-      - "virtual.tls-email=patrick@wagstrom.net"
+      - "virtual.tls=/etc/ssl/wagstrom.net-chain.pem /etc/ssl/wagstrom.net.pem"
       - "virtual.websockets"
 
   cards:
@@ -47,7 +49,8 @@ services:
     labels:
       - "virtual.host=cards.wagstrom.net"
       - "virtual.port=80"
-      - "virtual.tls-email=patrick@wagstrom.net"
+        # - "virtual.tls-email=patrick@wagstrom.net"
+      - "virtual.tls=/etc/ssl/wagstrom.net-chain.pem /etc/ssl/wagstrom.net.pem"
       - "virtual.websockets"
 
   httpbin:
@@ -57,7 +60,8 @@ services:
     labels:
       - "virtual.host=httpbin.wagstrom.net"
       - "virtual.port=80"
-      - "virtual.tls-email=patrick@wagstrom.net"
+        # - "virtual.tls-email=patrick@wagstrom.net"
+      - "virtual.tls=/etc/ssl/wagstrom.net-chain.pem /etc/ssl/wagstrom.net.pem"
 
   webdav-server:
     container_name: webdav
@@ -75,8 +79,9 @@ services:
     labels:
       - "virtual.host=secure.wagstrom.net"
       - "virtual.port=80"
-      - "virtual.tls-email=patrick@wagstrom.net"
+        # - "virtual.tls-email=patrick@wagstrom.net"
       - "virtual.websockets"
+      - "virtual.tls=/etc/ssl/wagstrom.net-chain.pem /etc/ssl/wagstrom.net.pem"
 
   hugo:
     container_name: hugo
@@ -89,7 +94,8 @@ services:
     labels:
       - "virtual.host=${HUGO_HOST}"
       - "virtual.port=1313"
-      - "virtual.tls-email=patrick@wagstrom.net"
+        # - "virtual.tls-email=patrick@wagstrom.net"
+      - "virtual.tls=/etc/ssl/wagstrom.net-chain.pem /etc/ssl/wagstrom.net.pem"
 
   acme-dns:
     container_name: acme-dns
@@ -100,11 +106,16 @@ services:
       - "53:53/udp"
     volumes:
       - ./acme-dns/config:/etc/acme-dns:ro
-      - ./acme-dns/data:/var/lib/acme-dns
+      - ./acme-dns/data:/var/lib/acme-dns:rw
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     labels:
       - "virtual.host=${ACME_HOST}"
       - "virtual.port=80"
-      - "virtual.tls-email=patrick@wagstrom.net"
+        # - "virtual.tls-email=patrick@wagstrom.net"
+      - "virtual.tls=/etc/ssl/wagstrom.net-chain.pem /etc/ssl/wagstrom.net.pem"
 
 #  kittens-website:
 #    container_name: caddy-kittens

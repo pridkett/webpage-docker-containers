@@ -1,7 +1,9 @@
 :80
 
-log stdout
+log {
+  output stdout
+}
 
-errors stdout
+# errors stdout
 
-root /srv
+root * /var/www/html
