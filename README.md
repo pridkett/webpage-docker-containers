@@ -14,7 +14,7 @@ Containers
 ----------
 
 * `caddy-gen`: This is the brains of the operation that does the magic of putting all of the containers behind the Caddy front door, grabbing SSL certificates, and more. This is a pretty basic configuration right now with no magic bells and whistles.
-* `personal-website`: A static content website based on nginx for my personal webpage.
+* `personal-website`: A Caddy 2 static file server for my personal webpage, behind `caddy-gen`.
 * `webdav-server`: A caddy based webdav server that I mainly use for syncing my [Zotero](https://www.zotero.org/) library across machines.
 * `vscode`: A browser based instance of Visual Studio Code. I often find myself traveling with only my work laptop and my personal iPad pro. This lets me have a full fledged development environment that I can work on when I don't have a physical machine with me.
 
@@ -34,7 +34,9 @@ container much faster in the even that something goes haywire.
 
 ### personal-website
 
-This will serve all of the static content that is mounted to `/srv`.
+This serves `/home/deploy/patrick.wagstrom.net/public`, mounted at
+`/usr/share/caddy`. The `personal-website` directory is mounted read-only at
+`/etc/caddy` and supplies the backend Caddyfile and weblog feed rules.
 
 ### webdav-server
 
@@ -57,6 +59,33 @@ Hostnames
 Hostnames for each of the individual services are set through the
 `virtual.host` and `virual.alias` labels that are applied to each
 container. This is the standard for projects that use `caddy-gen`.
+
+Weblog Feeds
+------------
+
+The website backend serves the canonical RSS and Atom feeds at `/index.rss`
+and `/index.atom`. `personal-website/feeds.caddy` supplies their content types,
+one-hour caching, public CORS access, and permanent redirects from legacy home,
+weblog, tag, and category feed URLs. Redirects take precedence over stale files.
+The feed rules mirror `ops/feeds.caddy` in the website source repository; keep
+these copies in sync when changing feed delivery behavior.
+
+After publishing the website output containing both feeds and updating this
+repository on the server, validate and recreate only the website service:
+
+```sh
+docker compose run --rm --no-deps personal-website caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+docker compose up -d --no-deps --force-recreate personal-website
+```
+
+The backend listens on HTTP port 80; the existing `caddy-gen` proxy continues to
+handle public hostnames and HTTPS. Check `/index.rss`, `/index.atom`, and legacy
+feed redirects over public HTTPS after rollout. Future changes to the feed rules
+can be loaded with:
+
+```sh
+docker compose exec personal-website caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
+```
 
 Future Changes
 --------------

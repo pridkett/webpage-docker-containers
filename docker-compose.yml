@@ -29,6 +29,7 @@ services:
     restart: always
     volumes:
       - /home/deploy/patrick.wagstrom.net/public:/usr/share/caddy
+      - ./personal-website:/etc/caddy:ro
     labels:
       - "virtual.host=patrick.wagstrom.net"
       - "virtual.alias=wagstrom.net www.wagstrom.net"

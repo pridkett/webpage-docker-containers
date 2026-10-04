@@ -1,0 +1,16 @@
+# Import inside the existing patrick.wagstrom.net site block, before file_server.
+# These redirects take precedence over stale files left by historical uploads.
+@legacyFeeds path_regexp legacyFeeds ^/(index\.xml|weblog/index\.(rss|xml)|((tags|categories)(/[^/]+)*/index\.(rss|xml)))$
+redir @legacyFeeds https://patrick.wagstrom.net/index.rss 308
+
+@rssFeed path /index.rss
+header @rssFeed Content-Type "application/rss+xml; charset=utf-8"
+
+@atomFeed path /index.atom
+header @atomFeed Content-Type "application/atom+xml; charset=utf-8"
+
+@canonicalFeeds path /index.rss /index.atom
+header @canonicalFeeds {
+    Cache-Control "public, max-age=3600"
+    Access-Control-Allow-Origin "*"
+}
