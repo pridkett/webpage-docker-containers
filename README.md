@@ -87,6 +87,17 @@ can be loaded with:
 docker compose exec personal-website caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
 ```
 
+If the analytics overlay below is enabled, use `/etc/analytics/Caddyfile` instead
+for validation and reload so logging remains enabled.
+
+Website Traffic Reports
+-----------------------
+
+Daily website traffic reporting is available through the opt-in
+[`compose.analytics.yml`](compose.analytics.yml) overlay. GoAccess produces
+separate non-crawler and crawler-only reports, with aggregate history in SQLite
+and optional Google Sheets export. See [the analytics setup guide](analytics/README.md).
+
 Future Changes
 --------------
 
