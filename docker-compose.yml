@@ -3,7 +3,6 @@ version: "2"
 services:
   caddy-gen:
     container_name: caddy-gen
-    # image: "wemakeservices/caddy-gen:latest"
     image: "wemakeservices/caddy-gen:latest"
     restart: always
     volumes:
@@ -116,7 +115,39 @@ services:
       - "virtual.port=80"
         # - "virtual.tls-email=patrick@wagstrom.net"
       - "virtual.tls=/etc/ssl/wagstrom.net-chain.pem /etc/ssl/wagstrom.net.pem"
+  
+    #  headscale:
+    #    image: headscale/headscale:latest
+    #    container_name: headscale
+    #    volumes:
+    #      - ./headscale/etc/headscale:/etc/headscale
+    #      - ./headscale/var/lib/headscale:/var/lib/headscale
+    #      - ./headscale/var/run/headscale:/var/run/headscale
+    #      - ./caddy/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory:/etc/caddy/acme
+    #    command: headscale serve
+    #    restart: unless-stopped
+    #    ports:
+    #      - 50443:50443
 
+  caddy:
+    image: caddy:2.6.1
+    container_name: headscale-caddy
+    hostname: caddy
+    restart: always
+    command: caddy run --config /etc/caddy/Caddyfile --adapter caddyfile --watch
+    ports:
+      - 443:443
+      - 80:80
+    environment:
+      - TZ="America/New_York"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+
+  # headscale-ui:
+  # container_name: headscale-ui
+  # image: 
 #  kittens-website:
 #    container_name: caddy-kittens
 #    build: ./kittens
