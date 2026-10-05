@@ -1,0 +1,30 @@
+{
+	servers {
+		trusted_proxies static {$WEBSITE_TRUSTED_PROXIES}
+		trusted_proxies_strict
+	}
+}
+
+:80 {
+	root * /usr/share/caddy
+	import /etc/caddy/feeds.caddy
+	log_append user_agent {http.request.header.User-Agent}
+	log_append referrer {http.request.header.Referer}
+	log {
+		output file /var/log/website/access.json {
+			mode 0600
+			roll_size 10MiB
+			roll_interval 24h
+			roll_keep 14
+			roll_keep_for 168h
+		}
+		format filter {
+			wrap json
+			request>headers delete
+			request>uri regexp "[?].*$" ""
+			referrer regexp "^(https?://[^/?#]+).*$" "$1"
+			resp_headers>Set-Cookie delete
+		}
+	}
+	file_server
+}

@@ -1,3 +1,7 @@
 docker-compose.yml.local
 .env
 certs
+analytics/logs/
+analytics/data/
+analytics/secrets/
+analytics/__pycache__/

@@ -1,0 +1,22 @@
+# Opt in with: docker compose -f docker-compose.yml -f compose.analytics.yml ...
+services:
+  personal-website:
+    image: caddy:2.11.6-alpine
+    environment:
+      WEBSITE_TRUSTED_PROXIES: ${WEBSITE_TRUSTED_PROXIES:?Set the caddy-gen Docker network CIDR or proxy IP}
+    command: [caddy, run, --config, /etc/analytics/Caddyfile, --adapter, caddyfile]
+    volumes:
+      - ./analytics/Caddyfile:/etc/analytics/Caddyfile:ro
+      - ./analytics/logs:/var/log/website
+
+  website-analytics:
+    profiles: [analytics]
+    build: ./analytics
+    environment:
+      ANALYTICS_TIMEZONE: ${ANALYTICS_TIMEZONE:-America/New_York}
+      ANALYTICS_SHEET_ID: ${ANALYTICS_SHEET_ID:-}
+      GOOGLE_APPLICATION_CREDENTIALS: /run/analytics-secrets/google-service-account.json
+    volumes:
+      - ./analytics/logs:/logs:ro
+      - ./analytics/data:/data
+      - ./analytics/secrets:/run/analytics-secrets:ro
